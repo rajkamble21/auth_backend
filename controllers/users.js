@@ -55,6 +55,31 @@ const login = async (req, res) => {
 
 }
 
+const getUser = async (req, res) =>{
+    try {
+        let id = parseInt(req.params.id);
+        let data = await pool.query('select * from users where id=$1', [id]);
+        res.status(200).json({
+            users: data.rows,
+        })
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+}
+
+const updateUser = async(req, res) =>{
+    try {
+        let id = parseInt(req.params.id);
+        let {username, email, bio, image} = req.body.user;
+        let data = await pool.query('update users set username = $1, email = $2, bio = $3, image = $4 where id = $5 returning *', [username, email, bio, image, id]);
+        res.status(200).json({
+            users: data.rows,
+        })
+    } catch (error) {
+        res.status(500).json({ error })
+    }
+}
+
 const getAllUsers = async (req, res) => {
     try {
         let data = await pool.query('select * from users');
@@ -70,5 +95,7 @@ const getAllUsers = async (req, res) => {
 module.exports = {
     register,
     login,
-    getAllUsers
+    getAllUsers,
+    getUser,
+    updateUser
 }
